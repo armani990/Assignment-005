@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Banner from "./components/Banner";
 import Navbar from "./components/Navbar";
 import TechnologyCard from "./components/TechnologyCard";
+import YourStack from "./components/YourStack";
 import type { Technology } from "./types/technology";
 
 function App() {
@@ -19,6 +20,14 @@ function App() {
 
   const handleAdd = (tech: Technology) => {
     setStack((prev) => [...prev, tech]);
+  };
+
+  const handleRemove = (id: string) => {
+    setStack((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleRemoveAll = () => {
+    setStack([]);
   };
 
   return (
@@ -40,15 +49,27 @@ function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {technologies.map((tech) => (
-              <TechnologyCard
-                key={tech.id}
-                tech={tech}
-                isAdded={stack.some((item) => item.id === tech.id)}
-                onAdd={handleAdd}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+            {/* Technology Cards */}
+            <div className="lg:col-span-3 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {technologies.map((tech) => (
+                <TechnologyCard
+                  key={tech.id}
+                  tech={tech}
+                  isAdded={stack.some((item) => item.id === tech.id)}
+                  onAdd={handleAdd}
+                />
+              ))}
+            </div>
+
+            {/* Your Stack Sidebar */}
+            <div className="lg:col-span-1">
+              <YourStack
+                stack={stack}
+                onRemove={handleRemove}
+                onRemoveAll={handleRemoveAll}
               />
-            ))}
+            </div>
           </div>
         </div>
       </section>
