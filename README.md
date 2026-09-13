@@ -1,75 +1,34 @@
-# React + TypeScript + Vite
+1. What is JSX, and why is it used in React?JSX is a syntax that lets us write HTML-like code inside JavaScript. It is used in React because it makes the code much easier to read and write. Without JSX, creating UI with only plain JavaScript would be more complicated and harder to maintain.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+2. What is the difference between props and state?
+Props are data that a parent component passes down to a child component. Props are read-only and cannot be changed by the child.
 
-Currently, two official plugins are available:
+State is data that belongs to a component itself. We can update it using the useState hook, and when the state changes, the component re-renders.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+3. What does the useState hook do, and where did you use it in this project?
+The useState hook allows a component to store and update its own data.
 
-## React Compiler
+In this project, I used it to store the list of technologies, the selected stack, the loading state, and also for the active link and mobile menu state in the Navbar.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+4. What does the useEffect hook do, and why did you need it to load the JSON data?
+useEffect is used to run some code after the component has rendered.
+I needed it to fetch the technology data from the JSON file when the page first loads, so the data is available as soon as the component mounts.
 
-## Expanding the ESLint configuration
+5. Why does every item in a .map() list need a unique key prop?
+When we use .map() to render a list, React needs a unique key for each item. This helps React identify which items have changed, been added, or removed. Without a proper key, React may update the wrong elements or cause unnecessary re-renders.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+6. What is conditional rendering? Show one place you used it.
+Conditional rendering means showing different UI based on a certain condition.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+In this project, I used it in several places:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+When the stack is empty, it shows “Your stack is empty”
+While the data is loading, it shows a loading spinner
+When a technology is already added, the button text changes to “✓ Added to Stack” and becomes disabled
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+7. How do you pass data from a parent component to a child component, and how does a child send something back to the parent?
+Data is passed from parent to child using props.
 
-```
+To send something back from child to parent, the parent passes a function as a prop, and the child calls that function when needed.
+For example, in this project, App.tsx passes tech, isAdded, and onAdd to the TechnologyCard component. When the user clicks the “Add to Stack” button, the child calls the onAdd function, and the parent updates the stack.
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
