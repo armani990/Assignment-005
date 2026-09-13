@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Banner from "./components/Banner";
 import Navbar from "./components/Navbar";
 import TechnologyCard from "./components/TechnologyCard";
@@ -8,26 +11,50 @@ import type { Technology } from "./types/technology";
 function App() {
   const [technologies, setTechnologies] = useState<Technology[]>([]);
   const [stack, setStack] = useState<Technology[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/technologies.json")
-      .then((res) => res.json())
-      .then((data) => setTechnologies(data))
-      .catch((error) => {
+    const loadData = async () => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        const res = await fetch("/technologies.json");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setTechnologies(data);
+      } catch (error) {
         console.error("Failed to load technologies:", error);
-      });
+        toast.error("Failed to load technologies");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const handleAdd = (tech: Technology) => {
+    const alreadyAdded = stack.some((item) => item.id === tech.id);
+
+    if (alreadyAdded) {
+      toast.warning(`${tech.name} is already in your stack!`);
+      return;
+    }
+
     setStack((prev) => [...prev, tech]);
+    toast.success(`${tech.name} added to stack!`);
   };
 
   const handleRemove = (id: string) => {
+    const item = stack.find((t) => t.id === id);
     setStack((prev) => prev.filter((t) => t.id !== id));
+    if (item) {
+      toast.info(`${item.name} removed from stack`);
+    }
   };
 
   const handleRemoveAll = () => {
     setStack([]);
+    toast.info("All technologies removed from stack");
   };
 
   return (
@@ -49,30 +76,44 @@ function App() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-            {/* Technology Cards */}
-            <div className="lg:col-span-3 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {technologies.map((tech) => (
-                <TechnologyCard
-                  key={tech.id}
-                  tech={tech}
-                  isAdded={stack.some((item) => item.id === tech.id)}
-                  onAdd={handleAdd}
-                />
-              ))}
+          {loading ? (
+            <div className="py-20 text-center">
+              <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-pink-500 border-t-transparent"></div>
+              <p className="mt-4 text-gray-500">Loading technologies...</p>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+              <div className="lg:col-span-3 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {technologies.map((tech) => (
+                  <TechnologyCard
+                    key={tech.id}
+                    tech={tech}
+                    isAdded={stack.some((item) => item.id === tech.id)}
+                    onAdd={handleAdd}
+                  />
+                ))}
+              </div>
 
-            {/* Your Stack Sidebar */}
-            <div className="lg:col-span-1">
-              <YourStack
-                stack={stack}
-                onRemove={handleRemove}
-                onRemoveAll={handleRemoveAll}
-              />
+              <div className="lg:col-span-1">
+                <YourStack
+                  stack={stack}
+                  onRemove={handleRemove}
+                  onRemoveAll={handleRemoveAll}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
+
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        theme="light"
+      />
     </>
   );
 }
