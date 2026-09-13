@@ -6,6 +6,7 @@ import Banner from "./components/Banner";
 import Navbar from "./components/Navbar";
 import TechnologyCard from "./components/TechnologyCard";
 import YourStack from "./components/YourStack";
+import Footer from "./components/Footer";
 import type { Technology } from "./types/technology";
 
 function App() {
@@ -105,6 +106,8 @@ function App() {
           )}
         </div>
       </section>
+
+      <Footer />
 
       <ToastContainer
         position="bottom-right"
